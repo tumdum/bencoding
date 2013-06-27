@@ -6,3 +6,5 @@ Package bencoding supports simple parser and renderer for [bencode](https://en.w
 [Official format specification](http://bittorrent.org/beps/bep_0003.html).
 
 [Api documentation](http://godoc.org/github.com/tumdum/bencoding).
+
+[![Build Status](https://travis-ci.org/tumdum/bencoding.png)](https://travis-ci.org/tumdum/bencoding)
