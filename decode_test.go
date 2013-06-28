@@ -324,3 +324,15 @@ func TestUnmarshalTorrentFromStringWitoutTorrentData(t *testing.T) {
 		t.Fatal("Expected to receive nil hash and error, got '%v' and '%v'", h, e)
 	}
 }
+
+func TestUnmarshalStructWithStringSlice(t *testing.T) {
+	type T struct {
+		X []string
+	}
+	var v T
+	s := "d1:Xl3:foo3:bar3:bazee"
+	d := NewStringDecoder(s)
+	if e := d.Decode(&v); e != nil {
+		t.Fatal(e)
+	}
+}
