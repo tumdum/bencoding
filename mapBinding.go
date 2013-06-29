@@ -40,7 +40,7 @@ func bindValues(field reflect.Value, value interface{}) bool {
 	vvalue := reflect.ValueOf(value)
 	if vvalue.Type().AssignableTo(field.Type()) {
 		field.Set(vvalue)
-    return true
+		return true
 	} else if isBindableStructAndDict(field, value) {
 		return bind(value.(map[string]interface{}), field) == nil
 	} else if field.Kind() == reflect.Ptr {
@@ -51,7 +51,7 @@ func bindValues(field reflect.Value, value interface{}) bool {
 				field.Set(reflect.Append(field, reflect.ValueOf(v)))
 			}
 		}
-    return true
+		return true
 	}
 	return false
 }

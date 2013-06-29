@@ -261,11 +261,11 @@ func (d *TorrentDecoder) unmarshalInt(v reflect.Value) error {
 		return errors.New("Malformed integer input")
 	}
 	d.b.ReadByte()
-	if data, err := d.b.ReadBytes('e'); err != nil {
-		return err
+	if data, e := d.b.ReadBytes('e'); e != nil {
+		return e
 	} else {
-		if val, err := strconv.ParseInt(string(data[:len(data)-1]), 10, 64); err != nil {
-			return err
+		if val, e := strconv.ParseInt(string(data[:len(data)-1]), 10, 64); e != nil {
+			return e
 		} else {
 			v.SetInt(val)
 		}
@@ -280,14 +280,14 @@ func (d *TorrentDecoder) unmarshalUint(v reflect.Value) error {
 		return errors.New("Malformed integer input")
 	}
 	d.b.ReadByte()
-	if data, err := d.b.ReadBytes('e'); err != nil {
-		return err
+	if data, e := d.b.ReadBytes('e'); e != nil {
+		return e
 	} else {
-		val, err := strconv.ParseUint(string(data[:len(data)-1]), 10, 64)
-		if err != nil {
-			return err
+		if val, e := strconv.ParseUint(string(data[:len(data)-1]), 10, 64); e != nil {
+			return e
+		} else {
+			v.SetUint(val)
 		}
-		v.SetUint(val)
 	}
 	return nil
 }
@@ -308,18 +308,18 @@ func readExactly(b *hashingRreader, out []byte) error {
 }
 
 func (d *TorrentDecoder) unmarshalString(v reflect.Value) error {
-	lStr, lErr := d.b.ReadBytes(':')
-	if lErr != nil {
-		return lErr
+	lStr, e := d.b.ReadBytes(':')
+	if e != nil {
+		return e
 	}
-	length, err := strconv.ParseInt(string(lStr[:len(lStr)-1]), 10, 64)
-	if err != nil {
-		return nil
+	length, e := strconv.ParseInt(string(lStr[:len(lStr)-1]), 10, 64)
+	if e != nil {
+		return e
 	}
 	content := make([]byte, length)
-	rErr := readExactly(d.b, content)
-	if rErr != nil {
-		return rErr
+	e = readExactly(d.b, content)
+	if e != nil {
+		return e
 	}
 	v.SetString(string(content))
 	return nil
