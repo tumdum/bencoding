@@ -317,8 +317,7 @@ func (d *TorrentDecoder) unmarshalString(v reflect.Value) error {
 		return e
 	}
 	content := make([]byte, length)
-	e = readExactly(d.b, content)
-	if e != nil {
+	if e = readExactly(d.b, content); e != nil {
 		return e
 	}
 	v.SetString(string(content))
