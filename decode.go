@@ -170,28 +170,9 @@ func (d *TorrentDecoder) unmarshalMap(v reflect.Value) error {
 		} else if b == 'e' {
 			break
 		}
-		var key string
-		keyv := reflect.ValueOf(&key).Elem()
-		if e := d.unmarshalString(keyv); e != nil {
+		if e := d.unmarshalKeyValuePair(v); e != nil {
 			return e
 		}
-
-		var infoEncountered bool
-		if key == "info" {
-			infoEncountered = true
-			d.b.StartHasing()
-		}
-
-		if newValue, e := d.unmarshalUnknownItem(); e != nil {
-			return e
-		} else {
-			v.SetMapIndex(keyv, newValue)
-		}
-
-		if infoEncountered {
-			d.b.StopHashing()
-		}
-
 	}
 	if b, e := d.peek(); e != nil {
 		return e
@@ -199,6 +180,31 @@ func (d *TorrentDecoder) unmarshalMap(v reflect.Value) error {
 		return errors.New("Malformed dict")
 	}
 	d.b.ReadByte()
+	return nil
+}
+
+func (d *TorrentDecoder) unmarshalKeyValuePair(v reflect.Value) error {
+	var key string
+	keyv := reflect.ValueOf(&key).Elem()
+	if e := d.unmarshalString(keyv); e != nil {
+		return e
+	}
+
+	var infoEncountered bool
+	if key == "info" {
+		infoEncountered = true
+		d.b.StartHasing()
+	}
+
+	if newValue, e := d.unmarshalUnknownItem(); e != nil {
+		return e
+	} else {
+		v.SetMapIndex(keyv, newValue)
+	}
+
+	if infoEncountered {
+		d.b.StopHashing()
+	}
 	return nil
 }
 
