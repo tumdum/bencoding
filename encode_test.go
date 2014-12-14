@@ -149,7 +149,7 @@ func TestMapAsDictMarshaling(t *testing.T) {
 		out []byte
 	}{
 		{map[string]string{}, []byte{'d', 'e'}},
-		{map[string]int{"1": 1, "3": 3, "123": 123}, []byte("d1:1i1e1:3i3e3:123i123ee")},
+		{map[string]int{"1": 1, "3": 3, "123": 123}, []byte("d1:1i1e3:123i123e1:3i3ee")},
 		{map[string]string{"publisher": "bob", "publisher-webpage": "www.example.com", "publisher.location": "home"}, []byte("d9:publisher3:bob17:publisher-webpage15:www.example.com18:publisher.location4:homee")},
 		{map[string]interface{}{"1": "one"}, []byte("d1:13:onee")},
 	}
