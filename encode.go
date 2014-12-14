@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"reflect"
+	"sort"
 	"strconv"
 )
 
@@ -185,19 +186,46 @@ func (e *encodeState) marshalArray(val reflect.Value) error {
 	return nil
 }
 
+type sortableByteSliceSlice [][]byte
+
+func (this sortableByteSliceSlice) Len() int {
+	return len(this)
+}
+
+func (this sortableByteSliceSlice) Less(i, j int) bool {
+	return bytes.Compare(this[i], this[j]) == -1
+}
+
+func (this sortableByteSliceSlice) Swap(i, j int) {
+	tmp := this[i]
+	this[i] = this[j]
+	this[j] = tmp
+}
+
 func (e *encodeState) marshalMap(val reflect.Value) error {
 	keys := val.MapKeys()
 	if err := e.WriteByte('d'); err != nil {
 		return err
 	}
-	for _, key := range keys {
+
+	rawKeys := make(sortableByteSliceSlice, len(keys))
+
+	for i, key := range keys {
 		if key.Kind() != reflect.String {
 			return errors.New("Map can be marshaled only if keys are of type 'string'")
 		}
-		if err := e.marshal(key); err != nil {
+		rawKeys[i] = []byte(key.String())
+	}
+
+	sort.Sort(rawKeys)
+
+	for _, rawKey := range rawKeys {
+		key := string(rawKey)
+		vKey := reflect.ValueOf(key)
+		if err := e.marshal(vKey); err != nil {
 			return err
 		}
-		value := val.MapIndex(key)
+		value := val.MapIndex(vKey)
 		if err := e.marshal(value); err != nil {
 			return err
 		}
@@ -210,6 +238,10 @@ func (e *encodeState) marshalStruct(val reflect.Value) error {
 		return err
 	}
 	valType := val.Type()
+
+	//Note: This marshals the fields in the order
+	//they are present in the struct. This is broken and does not
+	//produce valid output.
 	for i := 0; i < val.NumField(); i++ {
 		fieldValue := val.Field(i)
 		fieldOpt := extractFieldOptions(val, valType.Field(i).Name)
