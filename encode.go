@@ -233,26 +233,47 @@ func (e *encodeState) marshalMap(val reflect.Value) error {
 	return e.WriteByte('e')
 }
 
+type positionedField struct {
+	name string
+	pos  int
+}
+
+type positionedFieldsByName []positionedField
+
+func (f positionedFieldsByName) Len() int {
+	return len(f)
+}
+
+func (f positionedFieldsByName) Less(i, j int) bool {
+	return f[i].name < f[j].name
+}
+
+func (f positionedFieldsByName) Swap(i, j int) {
+	tmp := f[i]
+	f[i] = f[j]
+	f[j] = tmp
+}
+
 func (e *encodeState) marshalStruct(val reflect.Value) error {
 	if err := e.WriteByte('d'); err != nil {
 		return err
 	}
 	valType := val.Type()
 
-	//Note: This marshals the fields in the order
-	//they are present in the struct. This is broken and does not
-	//produce valid output.
+	fields := positionedFieldsByName{}
 	for i := 0; i < val.NumField(); i++ {
-		fieldValue := val.Field(i)
 		fieldOpt := extractFieldOptions(val, valType.Field(i).Name)
-		if fieldOpt == "" {
+		if len(fieldOpt) == 0 {
 			continue
 		}
-		fieldName := reflect.ValueOf(fieldOpt)
-		if err := e.marshal(fieldName); err != nil {
+		fields = append(fields, positionedField{fieldOpt, i})
+	}
+	sort.Sort(fields)
+	for _, f := range fields {
+		if err := e.marshal(reflect.ValueOf(f.name)); err != nil {
 			return err
 		}
-		if err := e.marshal(fieldValue); err != nil {
+		if err := e.marshal(val.Field(f.pos)); err != nil {
 			return err
 		}
 	}

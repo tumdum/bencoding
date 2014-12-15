@@ -171,7 +171,7 @@ func TestStructMarshaling(t *testing.T) {
 		Baz []string
 	}
 	test := Test{"FooValue", 42, []string{"A", "BB", "CCC"}}
-	expected := "d3:Foo8:FooValue3:Bari42e3:Bazl1:A2:BB3:CCCee"
+	expected := "d3:Bari42e3:Bazl1:A2:BB3:CCCe3:Foo8:FooValuee"
 	output, err := Marshal(test)
 	if err != nil {
 		t.Fatal(err)
@@ -297,9 +297,25 @@ func TestMarshalingOfTaggetStruct(t *testing.T) {
 		i             int
 	}
 	test := T{42, 0, 1, 1337}
+	expected := "d1:ii1337e1:si42ee"
 	if s, e := Marshal(test); e != nil {
 		t.Fatal(e)
-	} else if string(s) != "d1:si42e1:ii1337ee" {
-		t.Fatalf("Didn't expect '%v'", s)
+	} else if string(s) != expected {
+		t.Fatalf("Expected '%s', got '%s'", expected, string(s))
+	}
+}
+
+func TestMarshalingTaggedStructShouldOrderFieldsBasedOnTaggedNames(t *testing.T) {
+	type T struct {
+		A int `bencoding:"Z"`
+		B int `bencoding:"Y"`
+		C int `bencoding:"X"`
+	}
+	test := T{3, 2, 1}
+	expected := "d1:Xi1e1:Yi2e1:Zi3ee"
+	if s, e := Marshal(test); e != nil {
+		t.Fatal(e)
+	} else if string(s) != expected {
+		t.Fatalf("Expected '%s', got '%s'", expected, string(s))
 	}
 }

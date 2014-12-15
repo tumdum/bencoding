@@ -25,16 +25,14 @@ func parseTag(tag string) *string {
 	}
 }
 
-type fieldOptions string // empty if field is to be ignored
-
-func extractFieldOptions(v reflect.Value, name string) fieldOptions {
+func extractFieldOptions(v reflect.Value, name string) string {
 	tag := tagForFieldNamed(v, name)
 	bencodingTag := parseTag(tag)
 	if bencodingTag == nil {
-		return fieldOptions(name)
+		return name
 	} else if *bencodingTag == "" || *bencodingTag == "-" {
-		return fieldOptions("")
+		return ""
 	} else {
-		return fieldOptions(*bencodingTag)
+		return *bencodingTag
 	}
 }
