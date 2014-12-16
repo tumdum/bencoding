@@ -234,7 +234,7 @@ func (e *encodeState) marshalMap(val reflect.Value) error {
 }
 
 type positionedField struct {
-	name string
+	name []byte
 	pos  int
 }
 
@@ -245,7 +245,7 @@ func (f positionedFieldsByName) Len() int {
 }
 
 func (f positionedFieldsByName) Less(i, j int) bool {
-	return f[i].name < f[j].name
+	return bytes.Compare(f[i].name, f[j].name) == -1
 }
 
 func (f positionedFieldsByName) Swap(i, j int) {
@@ -266,7 +266,7 @@ func (e *encodeState) marshalStruct(val reflect.Value) error {
 		if len(fieldOpt) == 0 {
 			continue
 		}
-		fields = append(fields, positionedField{fieldOpt, i})
+		fields = append(fields, positionedField{[]byte(fieldOpt), i})
 	}
 	sort.Sort(fields)
 	for _, f := range fields {
