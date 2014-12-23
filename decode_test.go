@@ -35,7 +35,7 @@ func TestUnmarshalTwoInts(t *testing.T) {
 	if e := d.Decode(&i); e != nil {
 		t.Fatal(e)
 	} else if i != 5 {
-		t.Fatal("Expected 5 got '%v'", i)
+		t.Fatalf("Expected 5 got '%v'", i)
 	}
 	if e := d.Decode(&j); e != nil {
 		t.Fatal(e)
@@ -165,7 +165,7 @@ func TestUnmarshalDictWithOneEntry(t *testing.T) {
 	if e := dec.Decode(&d); e != nil {
 		t.Fatal(e)
 	} else if d["foo"].(int64) != 4 {
-		t.Fatal("Expected {foo:4} got '%v'", d)
+		t.Fatalf("Expected {foo:4} got '%v'", d)
 	}
 }
 
@@ -321,7 +321,7 @@ func TestUnmarshalTorrentFromStringWitoutTorrentData(t *testing.T) {
 	b := []byte("i5e")
 	h, e := UnmarshalTorrent(b, &i)
 	if e == nil || h != nil {
-		t.Fatal("Expected to receive nil hash and error, got '%v' and '%v'", h, e)
+		t.Fatalf("Expected to receive nil hash and error, got '%v' and '%v'", h, e)
 	}
 }
 
