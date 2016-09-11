@@ -17,11 +17,11 @@ type Info struct {
 }
 
 type Torrent struct {
-	Announce     string   `bencoding:"announce"`
+	Announce     string        `bencoding:"announce"`
 	AnnounceList []interface{} `bencoding:"announce-list"`
-	Comment      string   `bencoding:"comment"`
-	CreationDate int64    `bencoding:"creation date"`
-	Info         Info     `bencoding:"info"`
+	Comment      string        `bencoding:"comment"`
+	CreationDate int64         `bencoding:"creation date"`
+	Info         Info          `bencoding:"info"`
 }
 
 func usage() {
@@ -41,7 +41,7 @@ func main() {
 	d := bencoding.NewTorrentDecoder(f)
 	var t Torrent
 	if h, e := d.Decode(&t); e != nil {
-    panic(e)
+		panic(e)
 	} else {
 		fmt.Printf("  torrent: %+v\n     hash: %v\n", t, h)
 	}
